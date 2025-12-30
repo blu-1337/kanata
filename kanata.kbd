@@ -53,12 +53,12 @@
 (deflayer nav
   _ home up end bspc del _ _ _ _
   _ left down rght _ _ _ _ _
-  _ enter pgdn pgup _ _ _
+  _ enter C-left C-rght S-left S-rght _
 )
 
 ;; ---------- Ctrl-navigation layer (Q held) ----------
 (deflayer ctrl-nav
-  _ _ C-up _ _ _ _ _ _ _
+  _ pgdn C-up pgup _ _ _ _ _ _ _
   _ C-left C-down C-rght _ _ _ _ _
   _ _ _ _ _ _ _
 )
