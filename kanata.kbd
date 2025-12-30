@@ -30,15 +30,15 @@
   ;; - Only becomes a layer if held for 1000ms.
   ;; - If any other listed key is pressed before 1000ms, immediately commit
   ;;   the tap (the letter) and stop waiting. This keeps fast typing intact.
-  a-nav  (tap-hold-tap-keys 200 200 a (layer-while-held nav)
+  a-nav  (tap-hold-tap-keys 150 180 a (layer-while-held nav)
            (q w e r t y u i o p s d f g h j k l z x c v b n m))
 
-  q-ctrl (tap-hold-tap-keys 200 200 q (layer-while-held ctrl-nav)
+  q-ctrl (tap-hold-tap-keys 150 180 q (layer-while-held ctrl-nav)
            (w e r t y u i o p a s d f g h j k l z x c v b n m))
 
   ;; Z shortcuts as a "true" modifier: only activates after 1000ms.
   ;; If you type quickly (e.g. "za", "zv"), it will just type 'z'.
-  z-mod  (tap-hold-tap-keys 200 200 z (layer-while-held zmods)
+  z-mod  (tap-hold-tap-keys 150 180 z (layer-while-held zmods)
            (q w e r t y u i o p a s d f g h j k l x c v b n m))
 )
 
