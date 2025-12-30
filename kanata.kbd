@@ -1,6 +1,9 @@
 ;; ---------- Global config ----------
 (defcfg
-  process-unmapped-keys yes
+  ;; On Windows, AltGr is commonly represented as Ctrl+Alt internally.
+  ;; Processing unmapped keys can cause synthetic Ctrl to get "stuck" after
+  ;; AltGr combos on some layouts. Keep unmapped keys fully native.
+  process-unmapped-keys no
 )
 
 ;; ---------- Keys we intercept ----------
