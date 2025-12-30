@@ -4,54 +4,64 @@
   ;; Processing unmapped keys can cause synthetic Ctrl to get "stuck" after
   ;; AltGr combos on some layouts. Keep unmapped keys fully native.
   process-unmapped-keys no
+
+  ;; Extra safety for Windows layouts that implement AltGr as Ctrl+Alt.
+  ;; This helps prevent "stuck Ctrl" after AltGr (Right Alt) combos.
+  windows-altgr add-lctl-release
 )
 
 ;; ---------- Keys we intercept ----------
 (defsrc
-  caps
   ;; NOTE: Do NOT intercept Ctrl/Alt/AltGr on Windows.
   ;; Some layouts (incl. Romanian) implement AltGr in a way that can involve
   ;; a synthetic Ctrl press. Intercepting those modifiers can desync key-up
   ;; events and leave Ctrl "stuck".
   ;;
-  ;; Also: keep Romanian (Programmers) AltGr character keys fully native
-  ;; where possible (e.g. AltGr+I => î). So we only intercept the keys we
-  ;; actually need for layers/shortcuts.
-  q w e r t y
-  a s d f g
-  z x c v
+  ;; Include normal letter keys so tap-hold decisions work correctly
+  ;; during fast typing (kanata can't "see" excluded keys).
+  q w e r t y u i o p
+  a s d f g h j k l
+  z x c v b n m
 )
 
 ;; ---------- Aliases ----------
 (defalias
-  ;; Keep letter keys as letters for fast typing; use Caps as the nav-layer key.
-  caps-nav (tap-hold-release 200 1000 esc (layer-while-held nav))
-  q-ctrl (tap-hold-press   200 1000 q (layer-while-held ctrl-nav))
-  z-mod  (tap-hold-release 200 1000 z (layer-while-held zmods))
+  ;; Typing-workaround for home-row layers:
+  ;; - Avoid early hold activation during fast rolls by using tap-hold-tap-keys.
+  ;; - This waits the full hold timeout before activating the layer, but will
+  ;;   commit the tap early if you press another "typing" key.
+  a-nav  (tap-hold-tap-keys 200 200 a (layer-while-held nav)
+           (q w e r t y u i o p s d f g h j k l z x c v b n m))
+
+  q-ctrl (tap-hold-tap-keys 200 200 q (layer-while-held ctrl-nav)
+           (w e r t y u i o p a s d f g h j k l z x c v b n m))
+
+  ;; Z-held shortcuts should activate quickly with S/D/F/G, but remain a normal
+  ;; 'z' during regular typing rolls (e.g. z+x). So we eager-tap for most keys,
+  ;; excluding the shortcut triggers.
+  z-mod  (tap-hold-release-keys 200 200 z (layer-while-held zmods)
+           (q w e r t y u i o p a h j k l x c v b n m))
 )
 
 ;; ---------- Base layer ----------
 (deflayer base
-  @caps-nav
-  @q-ctrl w e r t y
-  a s d f g
-  @z-mod  x c v
+  @q-ctrl w e r t y u i o p
+  @a-nav  s d f g h j k l
+  @z-mod  x c v b n m
 )
 
 ;; ---------- Navigation layer (A held) ----------
 (deflayer nav
-  _
-  _ home up end bspc del
-  _ left down rght _
-  _ enter pgdn pgup
+  _ home up end bspc del _ _ _ _
+  _ left down rght _ _ _ _ _
+  _ enter pgdn pgup _ _ _
 )
 
 ;; ---------- Ctrl-navigation layer (Q held) ----------
 (deflayer ctrl-nav
-  _
-  _ _ C-up _ _ _
-  _ C-left C-down C-rght _
-  _ _ _ _
+  _ _ C-up _ _ _ _ _ _ _
+  _ C-left C-down C-rght _ _ _ _ _
+  _ _ _ _ _ _ _
 )
 
 ;; ---------- Z shortcuts layer (Z held) ----------
@@ -61,8 +71,7 @@
 ;; - Z+F = Ctrl+Tab
 ;; - Z+G = Alt+F4
 (deflayer zmods
-  _
-  _ _ _ _ _ _
-  _ C-A-tab C-w C-tab A-f4
-  _ _ _ _
+  _ _ _ _ _ _ _ _ _ _
+  _ C-A-tab C-w C-tab A-f4 _ _ _ _
+  _ _ _ _ _ _ _
 )
