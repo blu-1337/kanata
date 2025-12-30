@@ -26,21 +26,20 @@
 
 ;; ---------- Aliases ----------
 (defalias
-  ;; Typing-workaround for home-row layers:
-  ;; - Avoid early hold activation during fast rolls by using tap-hold-tap-keys.
-  ;; - This waits the full hold timeout before activating the layer, but will
-  ;;   commit the tap early if you press another "typing" key.
-  a-nav  (tap-hold-tap-keys 200 200 a (layer-while-held nav)
+  ;; "1 second unless interrupted" tap-hold:
+  ;; - Only becomes a layer if held for 1000ms.
+  ;; - If any other listed key is pressed before 1000ms, immediately commit
+  ;;   the tap (the letter) and stop waiting. This keeps fast typing intact.
+  a-nav  (tap-hold-tap-keys 200 1000 a (layer-while-held nav)
            (q w e r t y u i o p s d f g h j k l z x c v b n m))
 
-  q-ctrl (tap-hold-tap-keys 200 200 q (layer-while-held ctrl-nav)
+  q-ctrl (tap-hold-tap-keys 200 1000 q (layer-while-held ctrl-nav)
            (w e r t y u i o p a s d f g h j k l z x c v b n m))
 
-  ;; Z-held shortcuts should activate quickly with S/D/F/G, but remain a normal
-  ;; 'z' during regular typing rolls (e.g. z+x). So we eager-tap for most keys,
-  ;; excluding the shortcut triggers.
-  z-mod  (tap-hold-release-keys 200 200 z (layer-while-held zmods)
-           (q w e r t y u i o p a h j k l x c v b n m))
+  ;; Z shortcuts as a "true" modifier: only activates after 1000ms.
+  ;; If you type quickly (e.g. "za", "zv"), it will just type 'z'.
+  z-mod  (tap-hold-tap-keys 200 1000 z (layer-while-held zmods)
+           (q w e r t y u i o p a s d f g h j k l x c v b n m))
 )
 
 ;; ---------- Base layer ----------
@@ -72,6 +71,8 @@
 ;; - Z+G = Alt+F4
 (deflayer zmods
   _ _ _ _ _ _ _ _ _ _
-  _ C-A-tab C-w C-tab A-f4 _ _ _ _
+  ;; Default to normal typing on Z-layer; override only requested keys.
+  q w e r t y u i o p
+  a C-A-tab C-w C-tab A-f4 h j k l
   _ _ _ _ _ _ _
 )
