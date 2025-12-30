@@ -12,34 +12,51 @@
   ;; Some layouts (incl. Romanian) implement AltGr in a way that can involve
   ;; a synthetic Ctrl press. Intercepting those modifiers can desync key-up
   ;; events and leave Ctrl "stuck".
-  q w e r t y u i o p
-  a s d f g h j k l
-  z x c v b n m
+  ;;
+  ;; Also: keep Romanian (Programmers) AltGr character keys fully native
+  ;; where possible (e.g. AltGr+I => î). So we only intercept the keys we
+  ;; actually need for layers/shortcuts.
+  q w e r t y
+  a s d f g
+  z x c v
 )
 
 ;; ---------- Aliases ----------
 (defalias
   a-nav  (tap-hold-release 200 1000 a (layer-while-held nav))
   q-ctrl (tap-hold-press   200 1000 q (layer-while-held ctrl-nav))
+  z-mod  (tap-hold-release 200 1000 z (layer-while-held zmods))
 )
 
 ;; ---------- Base layer ----------
 (deflayer base
-  @q-ctrl w e r t y u i o p
-  @a-nav  s d f g h j k l
-  z x c v b n m
+  @q-ctrl w e r t y
+  @a-nav  s d f g
+  @z-mod  x c v
 )
 
 ;; ---------- Navigation layer (A held) ----------
 (deflayer nav
-  _ home up end bspc del _ _ _ _
-  _ left down rght _ _ _ _ _
-  _ enter pgdn pgup _ _ _
+  _ home up end bspc del
+  _ left down rght _
+  _ enter pgdn pgup
 )
 
 ;; ---------- Ctrl-navigation layer (Q held) ----------
 (deflayer ctrl-nav
-  _ _ C-up _ _ _ _ _ _ _
-  _ C-left C-down C-rght _ _ _ _ _
-  _ _ _ _ _ _ _
+  _ _ C-up _ _ _
+  _ C-left C-down C-rght _
+  _ _ _ _
+)
+
+;; ---------- Z shortcuts layer (Z held) ----------
+;; Requested:
+;; - Z+S = Ctrl+Alt+Tab
+;; - Z+D = Ctrl+W
+;; - Z+F = Ctrl+Tab
+;; - Z+G = Alt+F4
+(deflayer zmods
+  _ _ _ _ _ _
+  _ C-A-tab C-w C-tab A-f4
+  _ _ _ _
 )
