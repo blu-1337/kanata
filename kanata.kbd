@@ -21,57 +21,121 @@
   ;; during fast typing (kanata can't "see" excluded keys).
   q w e r t y u i o p
   a s d f g h j k l
-  z x c v b n m
+  z x c v b n m comma dot
+  ;; NOTE: Adding AltGr (Right Alt) enables D+AltGr=0, but may reintroduce
+  ;; "stuck Ctrl" issues on some Windows keyboard layouts. If that happens,
+  ;; remove `ralt` here and also remove the 4th row from each layer below.
+  ralt
 )
 
-;; ---------- Aliases ---------- make this work fine and amazing amazing grave grace of God This is awesome! this is aweseom awesome stuff great nwes news news queue quee que tal quapa que tal guap a que tal qu que tal guapa que tal guapa assssf awer awesome this is nice as it sould bea should be 
+;; ---------- Aliases ----------
 (defalias
   ;; "1 second unless interrupted" tap-hold:
   ;; - Only becomes a layer if held for 1000ms.
   ;; - If any other listed key is pressed before 1000ms, immediately commit
   ;;   the tap (the letter) and stop waiting. This keeps fast typing intact.
   a-nav  (tap-hold-tap-keys 150 180 a (layer-while-held nav)
-           (q w e r t y u i o p s d f g h j k l z x c v b n m))
+           (q w e r t y u i o p s d f g h j k l z x c v b n m comma dot))
 
   q-ctrl (tap-hold-tap-keys 150 180 q (layer-while-held ctrl-nav)
-           (w e r t y u i o p a s d f g h j k l z x c v b n m))
+           (w e r t y u i o p a s d f g h j k l z x c v b n m comma dot))
+
+  ;; W shortcuts (W held)
+  w-mod  (tap-hold-tap-keys 150 180 w (layer-while-held wmods)
+           (q e r t y u i o p a s d f g h j k l z x c v b n m comma dot))
+
+  ;; D numbers (D held)
+  d-num  (tap-hold-tap-keys 150 180 d (layer-while-held dnums)
+           (q w e r t y u i o p a s f g h j k l z x c v b n m comma dot ralt))
+
+  ;; F -> Q = Esc (F held)
+  f-mod  (tap-hold-tap-keys 150 180 f (layer-while-held fmods)
+           (q w e r t y u i o p a s d g h j k l z x c v b n m comma dot))
 
   ;; Z shortcuts as a "true" modifier: only activates after 1000ms.
   ;; If you type quickly (e.g. "za", "zv"), it will just type 'z'.
   z-mod  (tap-hold-tap-keys 150 180 z (layer-while-held zmods)
-           (q w e r t y u i o p a s d f g h j k l x c v b n m))
+           (q w e r t y u i o p a s d f g h j k l x c v b n m comma dot))
 )
 
 ;; ---------- Base layer ----------
 (deflayer base
-  @q-ctrl w e r t y u i o p
-  @a-nav  s d f g h j k l
-  @z-mod  x c v b n m
+  @q-ctrl @w-mod e r t y u i o p
+  @a-nav  s @d-num @f-mod g h j k l
+  @z-mod  x c v b n m comma dot
+  ralt
 )
 
 ;; ---------- Navigation layer (A held) ----------
 (deflayer nav
   _ home up end bspc del _ _ _ _
   _ left down rght _ _ _ _ _
-  _ enter C-left C-rght S-left S-rght _
+  _ enter C-left C-rght S-left S-rght _ _ _
+  _
 )
 
 ;; ---------- Ctrl-navigation layer (Q held) ----------
 (deflayer ctrl-nav
-  _ pgup C-up pgdn _ _ _ _ _ _ 
-  _ C-left C-down C-rght _ _ _ _ _
-  _ _ _ _ _ _ _
+  _ pgup C-up pgdn C-bspc C-del _ _ _ _
+  _ S-tab C-down tab _ _ _ _ _
+  _ _ _ _ _ _ _ _ _
+  _
 )
 
-;; ---------- Z shortcuts layer (Z held) ---------- 
+;; ---------- W shortcuts layer (W held) ----------
 ;; Requested:
-;; - Z+S = Ctrl+Shift+Tab
-;; - Z+D = Ctrl+W
-;; - Z+F = Ctrl+Tab
-;; - Z+G = Alt+F4
+;; - W+Z = Ctrl+Z
+;; - W+X = Ctrl+X
+;; - W+C = Ctrl+C
+;; - W+V = Ctrl+V
+;; - W+A = Ctrl+A
+;; - W+Y = Ctrl+Y
+;; - W+S = Ctrl+S
+(deflayer wmods
+  q w e r t C-y u i o p
+  C-a C-s d f g h j k l
+  C-z C-x C-c C-v b n m comma dot
+  ralt
+)
+
+;; ---------- D numbers layer (D held) ----------
+;; Requested:
+;; - D+M = 1
+;; - D+, = 2
+;; - D+. = 3
+;; - D+J = 4
+;; - D+K = 5
+;; - D+L = 6
+;; - D+U = 7
+;; - D+I = 8
+;; - D+O = 9
+;; - D+AltGr = 0
+(deflayer dnums
+  q w e r t y 7 8 9 p
+  a s d f g h 4 5 6 l
+  z x c v b n 1 2 3
+  0
+)
+
+;; ---------- F shortcuts layer (F held) ----------
+;; Requested:
+;; - F+Q = Esc
+(deflayer fmods
+  esc w e r t y u i o p
+  a s d f g h j k l
+  z x c v b n m comma dot
+  ralt
+)
+
+;; ---------- Z shortcuts layer (Z held) ----------
+;; Requested:
+;; - Z+G = Ctrl+T
+;; - Z+H = Ctrl+Shift+T
+;; (Other existing Z-layer shortcuts retained below.)
 (deflayer zmods
   ;; Default to normal typing on Z-layer; override only requested keys.
   q w e r t y u i o p
-  a C-S-tab C-w C-tab A-f4 h j k l
-  _ _ _ _ _ _ _
+  a C-S-tab C-w C-tab C-t C-S-t j k l
+  _ _ _ _ _ _ _ _ _
+  _
 )
