@@ -51,12 +51,12 @@
 
 ;; ---------- Z shortcuts layer (Z held) ----------
 ;; Requested:
-;; - Z+S = Ctrl+Alt+Tab
+;; - Z+S = Ctrl+Shift+Tab
 ;; - Z+D = Ctrl+W
 ;; - Z+F = Ctrl+Tab
 ;; - Z+G = Alt+F4
 (deflayer zmods
   _ _ _ _ _ _
-  _ C-A-tab C-w C-tab A-f4
+  _ C-S-tab C-w C-tab A-f4
   _ _ _ _
 )
