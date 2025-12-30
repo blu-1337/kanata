@@ -58,7 +58,7 @@
 
 ;; ---------- Ctrl-navigation layer (Q held) ----------
 (deflayer ctrl-nav
-  _ pgdn C-up pgup _ _ _ _ _ _ _
+  _ pgup C-up pgdn _ _ _ _ _ _ 
   _ C-left C-down C-rght _ _ _ _ _
   _ _ _ _ _ _ _
 )
