@@ -4,6 +4,10 @@
   ;; Processing unmapped keys can cause synthetic Ctrl to get "stuck" after
   ;; AltGr combos on some layouts. Keep unmapped keys fully native.
   process-unmapped-keys no
+
+  ;; Extra safety for Windows layouts that implement AltGr as Ctrl+Alt.
+  ;; This helps prevent "stuck Ctrl" after AltGr (Right Alt) combos.
+  windows-altgr add-lctl-release
 )
 
 ;; ---------- Keys we intercept ----------
@@ -13,50 +17,61 @@
   ;; a synthetic Ctrl press. Intercepting those modifiers can desync key-up
   ;; events and leave Ctrl "stuck".
   ;;
-  ;; Also: keep Romanian (Programmers) AltGr character keys fully native
-  ;; where possible (e.g. AltGr+I => î). So we only intercept the keys we
-  ;; actually need for layers/shortcuts.
-  q w e r t y
-  a s d f g
-  z x c v
+  ;; Include normal letter keys so tap-hold decisions work correctly
+  ;; during fast typing (kanata can't "see" excluded keys).
+  q w e r t y u i o p
+  a s d f g h j k l
+  z x c v b n m
 )
 
-;; ---------- Aliases ----------
+;; ---------- Aliases ---------- make this work fine and amazing amazing grave grace of God This is awesome! this is aweseom awesome stuff great nwes news news queue quee que tal quapa que tal guap a que tal qu que tal guapa que tal guapa assssf awer awesome this is nice as it sould bea should be 
 (defalias
-  a-nav  (tap-hold-release 200 1000 a (layer-while-held nav))
-  q-ctrl (tap-hold-press   200 1000 q (layer-while-held ctrl-nav))
-  z-mod  (tap-hold-release 200 1000 z (layer-while-held zmods))
+  ;; "1 second unless interrupted" tap-hold:
+  ;; - Only becomes a layer if held for 1000ms.
+  ;; - If any other listed key is pressed before 1000ms, immediately commit
+  ;;   the tap (the letter) and stop waiting. This keeps fast typing intact.
+  a-nav  (tap-hold-tap-keys 200 200 a (layer-while-held nav)
+           (q w e r t y u i o p s d f g h j k l z x c v b n m))
+
+  q-ctrl (tap-hold-tap-keys 200 200 q (layer-while-held ctrl-nav)
+           (w e r t y u i o p a s d f g h j k l z x c v b n m))
+
+  ;; Z shortcuts as a "true" modifier: only activates after 1000ms.
+  ;; If you type quickly (e.g. "za", "zv"), it will just type 'z'.
+  z-mod  (tap-hold-tap-keys 200 200 z (layer-while-held zmods)
+           (q w e r t y u i o p a s d f g h j k l x c v b n m))
 )
 
 ;; ---------- Base layer ----------
 (deflayer base
-  @q-ctrl w e r t y
-  @a-nav  s d f g
-  @z-mod  x c v
+  @q-ctrl w e r t y u i o p
+  @a-nav  s d f g h j k l
+  @z-mod  x c v b n m
 )
 
 ;; ---------- Navigation layer (A held) ----------
 (deflayer nav
-  _ home up end bspc del
-  _ left down rght _
-  _ enter pgdn pgup
+  _ home up end bspc del _ _ _ _
+  _ left down rght _ _ _ _ _
+  _ enter pgdn pgup _ _ _
 )
 
 ;; ---------- Ctrl-navigation layer (Q held) ----------
 (deflayer ctrl-nav
-  _ _ C-up _ _ _
-  _ C-left C-down C-rght _
-  _ _ _ _
+  _ _ C-up _ _ _ _ _ _ _
+  _ C-left C-down C-rght _ _ _ _ _
+  _ _ _ _ _ _ _
 )
 
-;; ---------- Z shortcuts layer (Z held) ----------
+;; ---------- Z shortcuts layer (Z held) ---------- 
 ;; Requested:
 ;; - Z+S = Ctrl+Shift+Tab
 ;; - Z+D = Ctrl+W
 ;; - Z+F = Ctrl+Tab
 ;; - Z+G = Alt+F4
 (deflayer zmods
-  _ _ _ _ _ _
-  _ C-S-tab C-w C-tab A-f4
-  _ _ _ _
+  ;; Default to normal typing on Z-layer; override only requested keys.
+  q w e r t y u i o p
+  a C-S-tab C-w C-tab A-f4 h j k l
+  _ _ _ _ _ _ _
 )
