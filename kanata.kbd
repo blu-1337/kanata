@@ -8,6 +8,7 @@
 
 ;; ---------- Keys we intercept ----------
 (defsrc
+  caps
   ;; NOTE: Do NOT intercept Ctrl/Alt/AltGr on Windows.
   ;; Some layouts (incl. Romanian) implement AltGr in a way that can involve
   ;; a synthetic Ctrl press. Intercepting those modifiers can desync key-up
@@ -23,20 +24,23 @@
 
 ;; ---------- Aliases ----------
 (defalias
-  a-nav  (tap-hold-release 200 1000 a (layer-while-held nav))
+  ;; Keep letter keys as letters for fast typing; use Caps as the nav-layer key.
+  caps-nav (tap-hold-release 200 1000 esc (layer-while-held nav))
   q-ctrl (tap-hold-press   200 1000 q (layer-while-held ctrl-nav))
   z-mod  (tap-hold-release 200 1000 z (layer-while-held zmods))
 )
 
 ;; ---------- Base layer ----------
 (deflayer base
+  @caps-nav
   @q-ctrl w e r t y
-  @a-nav  s d f g
+  a s d f g
   @z-mod  x c v
 )
 
 ;; ---------- Navigation layer (A held) ----------
 (deflayer nav
+  _
   _ home up end bspc del
   _ left down rght _
   _ enter pgdn pgup
@@ -44,6 +48,7 @@
 
 ;; ---------- Ctrl-navigation layer (Q held) ----------
 (deflayer ctrl-nav
+  _
   _ _ C-up _ _ _
   _ C-left C-down C-rght _
   _ _ _ _
@@ -56,6 +61,7 @@
 ;; - Z+F = Ctrl+Tab
 ;; - Z+G = Alt+F4
 (deflayer zmods
+  _
   _ _ _ _ _ _
   _ C-A-tab C-w C-tab A-f4
   _ _ _ _
