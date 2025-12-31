@@ -4,8 +4,7 @@
 ;; Notes:
 ;; - This file only intercepts the specific keys needed for the bindings below.
 ;; - Everything else stays fully native (process-unmapped-keys = no).
-;; - "Always on top" is implemented via `wmctrl` (X11). If you are on Wayland
-;;   or don't have wmctrl installed, replace that alias with your WM/DE shortcut.
+;; - "Always on top" is implemented for Windows via PowerShell/user32.
 
 ;; ---------- Global config ----------
 (defcfg
@@ -18,7 +17,7 @@
   ;; Row-ish layout (only the keys we need)
   tab 1 2 3 4 5 6 q w e r t
   caps a s d
-  z x c space lctl lalt
+  z x c spc lctl lalt
 )
 
 ;; ---------- Aliases ----------
@@ -49,16 +48,16 @@
   ins-code (macro S-comm c o d e S-dot S-comm slsh c o d e S-dot
                   left left left left left left left)
 
-  ;; Toggle active window "always on top" (X11).
-  ;; Requires: wmctrl (e.g. `sudo apt install wmctrl`)
-  win-top  (cmd "wmctrl -r :ACTIVE: -b toggle,above")
+  ;; Toggle active window "always on top" (Windows).
+  ;; Uses user32.dll; no external dependencies.
+  win-top (cmd "powershell -NoProfile -ExecutionPolicy Bypass -Command \"$ErrorActionPreference='SilentlyContinue'; Add-Type @' using System; using System.Runtime.InteropServices; public class Win { [DllImport(\\\"user32.dll\\\")] public static extern IntPtr GetForegroundWindow(); [DllImport(\\\"user32.dll\\\")] public static extern int GetWindowLong(IntPtr hWnd,int nIndex); [DllImport(\\\"user32.dll\\\")] public static extern bool SetWindowPos(IntPtr hWnd,IntPtr hWndInsertAfter,int X,int Y,int cx,int cy,uint uFlags); public static readonly IntPtr HWND_TOPMOST=new IntPtr(-1); public static readonly IntPtr HWND_NOTOPMOST=new IntPtr(-2); public const int GWL_EXSTYLE=-20; public const int WS_EX_TOPMOST=0x00000008; public const uint SWP_NOMOVE=0x0002; public const uint SWP_NOSIZE=0x0001; public const uint SWP_SHOWWINDOW=0x0040; } '@; $h=[Win]::GetForegroundWindow(); if($h -eq [IntPtr]::Zero){exit}; $ex=[Win]::GetWindowLong($h,[Win]::GWL_EXSTYLE); $top=(($ex -band [Win]::WS_EX_TOPMOST) -ne 0); $after=if($top){[Win]::HWND_NOTOPMOST}else{[Win]::HWND_TOPMOST}; [void][Win]::SetWindowPos($h,$after,0,0,0,0,[Win]::SWP_NOMOVE -bor [Win]::SWP_NOSIZE -bor [Win]::SWP_SHOWWINDOW);\"")
 )
 
 ;; ---------- Base layer (normal typing) ----------
 (deflayer base
   tab 1 2 3 4 5 6 q w e r t
   @caps-nav a s d
-  z x c space @ctl-hold lalt
+  z x c spc @ctl-hold lalt
 )
 
 ;; ---------- Caps navigation layer ----------
