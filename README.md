@@ -1,8 +1,33 @@
 # kanata keyboard config
 
-This repo contains a single [Kanata](https://github.com/jtroo/kanata)-style keyboard remapping configuration in `kanata.kbd`.
+This repo contains two [Kanata](https://github.com/jtroo/kanata)-style keyboard remapping configurations:
+
+- **`kanata.kbd`**: the “full” tap/hold layers setup (navigation, editing, numbers, common shortcuts).
+- **`kanata-kaps.kbd`**: a smaller CapsLock-as-modifier setup (navigation + a few macros), intended to intercept fewer keys.
+
+## Running (Windows)
+
+From the extracted Kanata Windows binaries folder (v1.10.1), run:
+
+```bat
+kanata-windows-binaries-x64-v1.10.1> .\kanata_windows_tty_winIOv2_cmd_allowed_x64.exe
+```
+
+Then point Kanata at the config you want to use:
+
+- **Full config**: `kanata.kbd`
+- **CapsLock config**: `kanata-kaps.kbd`
+
+If you’re not sure about the exact CLI flags for your build, run the same command with `--help` and use the config-path option it documents (commonly `--cfg <path>`). Example (common on many builds):
+
+```bat
+kanata-windows-binaries-x64-v1.10.1> .\kanata_windows_tty_winIOv2_cmd_allowed_x64.exe --cfg ..\kanata.kbd
+kanata-windows-binaries-x64-v1.10.1> .\kanata_windows_tty_winIOv2_cmd_allowed_x64.exe --cfg ..\kanata-kaps.kbd
+```
 
 ## High-level behavior
+
+The sections below describe **`kanata.kbd`** (the full tap/hold layers config).
 
 - **Regular typing stays normal** (tap the letter → the letter).
 - Some letters are **tap-or-hold** keys:
@@ -107,3 +132,18 @@ Existing tab-management shortcuts (kept) plus your new requests:
 - **Z+F** → `Ctrl+Tab`
 - **Z+G** → `Ctrl+T`
 - **Z+H** → `Ctrl+Shift+T`
+
+## `kanata-kaps.kbd` (CapsLock-as-modifier)
+
+This is a smaller config built around **CapsLock as a “hold for nav/macros” key**, intended to keep most keys fully native while still providing a compact navigation/utility layer.
+
+- **How it works**: **hold `CapsLock`** to activate the `nav` layer; tap behavior remains normal for the other keys in `defsrc`.
+- **Intercepted keys** (see `defsrc`): `tab`, `1-8`, `q w e r t`, `caps`, `a s d`, `z x c v b`, `spc`, `ralt`.
+- **Notable bindings while holding `CapsLock`**:
+  - **`Caps` + `1/2/3/4`** → `Ctrl+Shift+Tab` / `Ctrl+W` / `Ctrl+Tab` / `Alt+F4`
+  - **`Caps` + `5`** → insert DokuWiki “mark” snippet (macro)
+  - **`Caps` + `6`** → insert DokuWiki `<code></code>` snippet (macro)
+  - **`Caps` + `Q/W/E/R/T`** → `Home` / `Up` / `End` / `Backspace` / `Delete`
+  - **`Caps` + `A/S/D`** → `Left` / `Down` / `Right`
+  - **`Caps` + `Z/X/C`** → delete line (macro) / `Enter` / “new line at end” (macro)
+  - **`Caps` + `V/B`** → `PageDown` / `PageUp`
