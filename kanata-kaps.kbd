@@ -1,0 +1,104 @@
+;; kanata-kaps.kbd
+;; Minimal CapsLock-as-modifier layer (based on style of ./kanata.kbd)
+;;
+;; Notes:
+;; - This file only intercepts the specific keys needed for the bindings below.
+;; - Everything else stays fully native (process-unmapped-keys = no).
+;; - "Always on top" is implemented via `wmctrl` (X11). If you are on Wayland
+;;   or don't have wmctrl installed, replace that alias with your WM/DE shortcut.
+
+;; ---------- Global config ----------
+(defcfg
+  process-unmapped-keys no
+  windows-altgr add-lctl-release
+)
+
+;; ---------- Keys we intercept ----------
+(defsrc
+  ;; Row-ish layout (only the keys we need)
+  tab 1 2 3 4 5 6 q w e r t
+  caps a s d
+  z x c space lctl lalt
+)
+
+;; ---------- Aliases ----------
+(defalias
+  ;; CapsLock becomes a momentary layer switch (no tap action).
+  caps-nav (layer-while-held nav)
+
+  ;; Ctrl+Alt chords without a dedicated "combo" feature:
+  ;; - Holding Ctrl enters `ctl` while still acting as Ctrl.
+  ;; - While in `ctl`, holding Alt enters `ctl-alt` while still acting as Alt.
+  ctl-hold (multi lctl (layer-while-held ctl))
+  alt-ctl  (multi lalt (layer-while-held ctl-alt))
+
+  ;; Delete current line (cursor can be anywhere):
+  ;; Home, select to end, select newline, delete.
+  del-line (macro home S-end S-rght del)
+
+  ;; New line at end of current line (cursor can be anywhere).
+  ;; (This does NOT preserve cursor position; it moves to the new line.)
+  new-line (macro end enter)
+
+  ;; Insert "%%%%" and place cursor in the middle (%%%% -> %%|%%).
+  ;; Assumes a US-like layout where '%' is Shift+5.
+  ins-perc (macro S-5 S-5 S-5 S-5 left left)
+
+  ;; Insert "<code></code>" and place cursor at end of first tag: <code>|</code>
+  ;; Assumes a US-like layout where '<' is Shift+comma and '>' is Shift+dot.
+  ins-code (macro S-comm c o d e S-dot S-comm slsh c o d e S-dot
+                  left left left left left left left)
+
+  ;; Toggle active window "always on top" (X11).
+  ;; Requires: wmctrl (e.g. `sudo apt install wmctrl`)
+  win-top  (cmd "wmctrl -r :ACTIVE: -b toggle,above")
+)
+
+;; ---------- Base layer (normal typing) ----------
+(deflayer base
+  tab 1 2 3 4 5 6 q w e r t
+  @caps-nav a s d
+  z x c space @ctl-hold lalt
+)
+
+;; ---------- Caps navigation layer ----------
+;; Bindings requested:
+;; CAPS + Q = Home
+;; CAPS + E = End
+;; CAPS + W/A/S/D = Up/Left/Down/Right
+;; CAPS + X = Enter
+;; CAPS + Z = delete one line
+;; CAPS + R = Backspace
+;; CAPS + T = Delete
+;; CAPS + C = new line (end + enter)
+;; CAPS + 1 = previous tab
+;; CAPS + 2 = Ctrl+W (close tab)
+;; CAPS + 3 = next tab
+;; CAPS + 4 = Alt+F4 (close window)
+;; CAPS + 5 = "%%%%" with cursor in middle
+;; CAPS + 6 = "<code></code>" with cursor at end of first tag
+;; CAPS + TAB = toggle CapsLock
+(deflayer nav
+  caps C-S-tab C-w C-tab A-f4 @ins-perc @ins-code home up end bspc del
+  _    left down rght
+  @del-line enter @new-line _ _ _
+)
+
+;; ---------- Ctrl layer (Ctrl held) ----------
+;; Keep Ctrl behavior, and allow Ctrl+Alt+... to enter ctl-alt.
+(deflayer ctl
+  _ _ _ _ _ _ _ _ _ _ _ _ _
+  _ _ _ _
+  _ _ _ _ _ @alt-ctl
+)
+
+;; ---------- Ctrl+Alt layer ----------
+;; Requested:
+;; CTRL + ALT + Space = make window stay always on top
+;; CTRL + ALT + R     = reload script (reload this kanata config)
+(deflayer ctl-alt
+  _ _ _ _ _ _ _ _ _ _ _ reload _
+  _ _ _ _
+  _ _ _ @win-top _ _
+)
+
