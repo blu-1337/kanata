@@ -35,13 +35,6 @@
   ;; New line at end of current line (cursor can be anywhere): End, Enter
   new-line (macro end enter)
 
-  ;; CAPS+5: insert %%%% and place cursor in middle (%%|%%)
-  ;; SendKeys: '%' is special, so use '{%}' for literal percent.
-  ins-perc (cmd "powershell -NoProfile -ExecutionPolicy Bypass -Command \"Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.SendKeys]::SendWait('{%}{%}{%}{%}{LEFT}{LEFT}')\"")
-
-  ;; CAPS+6: insert <code></code> and place cursor at end of first tag: <code>|</code>
-  ins-code (cmd "powershell -NoProfile -ExecutionPolicy Bypass -Command \"Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.SendKeys]::SendWait('<code></code>{LEFT}{LEFT}{LEFT}{LEFT}{LEFT}{LEFT}{LEFT}')\"")
-
   ;; Ctrl+Alt+Space: toggle always-on-top for active window (Windows user32)
   win-top (cmd "powershell -NoProfile -ExecutionPolicy Bypass -Command \"$ErrorActionPreference='SilentlyContinue'; Add-Type @' using System; using System.Runtime.InteropServices; public class Win { [DllImport(\\\"user32.dll\\\")] public static extern IntPtr GetForegroundWindow(); [DllImport(\\\"user32.dll\\\")] public static extern int GetWindowLong(IntPtr hWnd,int nIndex); [DllImport(\\\"user32.dll\\\")] public static extern bool SetWindowPos(IntPtr hWnd,IntPtr hWndInsertAfter,int X,int Y,int cx,int cy,uint uFlags); public static readonly IntPtr HWND_TOPMOST=new IntPtr(-1); public static readonly IntPtr HWND_NOTOPMOST=new IntPtr(-2); public const int GWL_EXSTYLE=-20; public const int WS_EX_TOPMOST=0x00000008; public const uint SWP_NOMOVE=0x0002; public const uint SWP_NOSIZE=0x0001; public const uint SWP_SHOWWINDOW=0x0040; } '@; $h=[Win]::GetForegroundWindow(); if($h -eq [IntPtr]::Zero){exit}; $ex=[Win]::GetWindowLong($h,[Win]::GWL_EXSTYLE); $top=(($ex -band [Win]::WS_EX_TOPMOST) -ne 0); $after=if($top){[Win]::HWND_NOTOPMOST}else{[Win]::HWND_TOPMOST}; [void][Win]::SetWindowPos($h,$after,0,0,0,0,[Win]::SWP_NOMOVE -bor [Win]::SWP_NOSIZE -bor [Win]::SWP_SHOWWINDOW);\"")
 
@@ -58,7 +51,7 @@
 
 (deflayer nav
   ;; Row 1 corresponds to: tab 1 2 3 4 5 6 q w e r t
-  caps C-S-tab C-w C-tab A-f4 @ins-perc @ins-code home up end bspc del
+  caps C-S-tab C-w C-tab A-f4 _ _ home up end bspc del
 
   ;; Row 2 corresponds to: caps a s d
   _    left down rght
