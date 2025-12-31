@@ -32,8 +32,11 @@
   ;; New line at end of current line (cursor can be anywhere): End, Enter
   new-line (macro end enter)
 
-  ;; CAPS+8: insert text snippet
-  ins-tnd (macro t o m o r r o w spc n e v e r spc d i e s)
+  ;; insert text snippet dorkuwiki mark
+  ins-dokumark (macro ' ' S-5 S-5 S-5 S-5 ' ' left left left left)
+
+  ;; insert text snippet dorkuwiki code
+  ins-code (macro S-, c o d e S-. S-, / c o d e S-. left left left left left left left) 
 )
 
 (deflayer base
@@ -45,7 +48,7 @@
 
 (deflayer nav
   ;; Row 1 corresponds to: tab 1 2 3 4 5 6 7 8 q w e r t
-  caps C-S-tab C-w C-tab A-f4 C-t C-S-t _ @ins-tnd home up end bspc del
+  caps C-S-tab C-w C-tab A-f4 @ins-dokumark @ins-code _ _ home up end bspc del
 
   ;; Row 2 corresponds to: caps a s d
   _    left down rght
