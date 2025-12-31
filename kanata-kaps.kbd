@@ -19,6 +19,7 @@
   tab 1 2 3 4 5 6 q w e r t
   caps a s d
   z x c v b spc
+  ralt
 )
 
 (defalias
@@ -36,15 +37,19 @@
   tab 1 2 3 4 5 6 q w e r t
   @caps-nav a s d
   z x c v b spc
+  ralt
 )
 
 (deflayer nav
   ;; Row 1 corresponds to: tab 1 2 3 4 5 6 q w e r t
-  caps C-S-tab C-w C-tab A-f4 _ _ home up end bspc del
+  caps C-S-tab C-w C-tab A-f4 C-t C-S-t home up end bspc del
 
   ;; Row 2 corresponds to: caps a s d
   _    left down rght
 
   ;; Row 3 corresponds to: z x c v b spc
   @del-line enter @new-line pgdn pgup _
+
+  ;; Row 4 corresponds to: ralt
+  _
 )
