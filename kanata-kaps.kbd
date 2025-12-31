@@ -4,6 +4,7 @@
 ;; Notes:
 ;; - This file only intercepts the specific keys needed for the bindings below.
 ;; - Everything else stays fully native (process-unmapped-keys = no).
+;; - "Always on top" is implemented for Windows via PowerShell/user32.
 
 ;; ---------- Global config ----------
 
@@ -34,6 +35,9 @@
   ;; New line at end of current line (cursor can be anywhere): End, Enter
   new-line (macro end enter)
 
+  ;; Ctrl+Space: toggle always-on-top for active window (Windows user32)
+  win-top (cmd "powershell -NoProfile -ExecutionPolicy Bypass -Command \"$ErrorActionPreference='SilentlyContinue'; Add-Type @' using System; using System.Runtime.InteropServices; public class Win { [DllImport(\\\"user32.dll\\\")] public static extern IntPtr GetForegroundWindow(); [DllImport(\\\"user32.dll\\\")] public static extern int GetWindowLong(IntPtr hWnd,int nIndex); [DllImport(\\\"user32.dll\\\")] public static extern bool SetWindowPos(IntPtr hWnd,IntPtr hWndInsertAfter,int X,int Y,int cx,int cy,uint uFlags); public static readonly IntPtr HWND_TOPMOST=new IntPtr(-1); public static readonly IntPtr HWND_NOTOPMOST=new IntPtr(-2); public const int GWL_EXSTYLE=-20; public const int WS_EX_TOPMOST=0x00000008; public const uint SWP_NOMOVE=0x0002; public const uint SWP_NOSIZE=0x0001; public const uint SWP_SHOWWINDOW=0x0040; } '@; $h=[Win]::GetForegroundWindow(); if($h -eq [IntPtr]::Zero){exit}; $ex=[Win]::GetWindowLong($h,[Win]::GWL_EXSTYLE); $top=(($ex -band [Win]::WS_EX_TOPMOST) -ne 0); $after=if($top){[Win]::HWND_NOTOPMOST}else{[Win]::HWND_TOPMOST}; [void][Win]::SetWindowPos($h,$after,0,0,0,0,[Win]::SWP_NOMOVE -bor [Win]::SWP_NOSIZE -bor [Win]::SWP_SHOWWINDOW);\"")
+
   ;; Ctrl+Alt+R: "reload" by starting a new kanata and killing the oldest instance.
   ;; If your exe name differs, change $n below to match (without .exe).
   reload-kanata (cmd "powershell -NoProfile -ExecutionPolicy Bypass -Command \"$n='kanata_windows_tty_winIOv2_cmd_allowed_x64'; Start-Process (Join-Path (Get-Location) ($n + '.exe')); Start-Sleep -Milliseconds 250; $p=Get-Process $n -ErrorAction SilentlyContinue | Sort-Object StartTime; if($p.Count -gt 1){ Stop-Process -Id $p[0].Id -Force }\"")
@@ -60,7 +64,7 @@
   ;; Keep Ctrl behavior; only use this layer to detect Alt and enter ctl-alt.
   _ _ _ _ _ _ _ _ _ _ _ _
   _ _ _ _
-  _ _ _ _ _ _ lctl @alt-ctl
+  _ _ _ _ _ @win-top lctl @alt-ctl
 )
 
 (deflayer ctl-alt
