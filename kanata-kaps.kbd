@@ -86,9 +86,9 @@
 ;; ---------- Ctrl layer (Ctrl held) ----------
 ;; Keep Ctrl behavior, and allow Ctrl+Alt+... to enter ctl-alt.
 (deflayer ctl
-  _ _ _ _ _ _ _ _ _ _ _ _ _
+  _ _ _ _ _ _ _ _ _ _ _ _
   _ _ _ _
-  _ _ _ _ _ @alt-ctl
+  _ _ _ _ lctl @alt-ctl
 )
 
 ;; ---------- Ctrl+Alt layer ----------
@@ -96,7 +96,7 @@
 ;; CTRL + ALT + Space = make window stay always on top
 ;; CTRL + ALT + R     = reload script (reload this kanata config)
 (deflayer ctl-alt
-  _ _ _ _ _ _ _ _ _ _ _ reload _
+  _ _ _ _ _ _ _ _ _ _ reload _
   _ _ _ _
   _ _ _ @win-top _ _
 )
