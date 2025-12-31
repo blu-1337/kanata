@@ -16,7 +16,7 @@
 )
 
 (defsrc
-  tab 1 2 3 4 5 6 q w e r t
+  tab 1 2 3 4 5 6 7 8 q w e r t
   caps a s d
   z x c v b spc
   ralt
@@ -31,18 +31,21 @@
 
   ;; New line at end of current line (cursor can be anywhere): End, Enter
   new-line (macro end enter)
+
+  ;; CAPS+8: insert text snippet
+  ins-tnd (macro t o m o r r o w spc n e v e r spc d i e s)
 )
 
 (deflayer base
-  tab 1 2 3 4 5 6 q w e r t
+  tab 1 2 3 4 5 6 7 8 q w e r t
   @caps-nav a s d
   z x c v b spc
   ralt
 )
 
 (deflayer nav
-  ;; Row 1 corresponds to: tab 1 2 3 4 5 6 q w e r t
-  caps C-S-tab C-w C-tab A-f4 C-t C-S-t home up end bspc del
+  ;; Row 1 corresponds to: tab 1 2 3 4 5 6 7 8 q w e r t
+  caps C-S-tab C-w C-tab A-f4 C-t C-S-t _ @ins-tnd home up end bspc del
 
   ;; Row 2 corresponds to: caps a s d
   _    left down rght
