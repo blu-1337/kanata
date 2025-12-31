@@ -40,13 +40,15 @@
   new-line (macro end enter)
 
   ;; Insert "%%%%" and place cursor in the middle (%%%% -> %%|%%).
-  ;; Assumes a US-like layout where '%' is Shift+5.
-  ins-perc (macro S-5 S-5 S-5 S-5 left left)
+  ;; Implemented via PowerShell SendKeys to avoid layout-specific key names.
+  ;; Sends: %%%% then Left Left (%%%% -> %%|%%)
+  ;; NOTE: In SendKeys, '%' is special, so we use '{%}' for a literal percent.
+  ins-perc (cmd "powershell -NoProfile -ExecutionPolicy Bypass -Command \"Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.SendKeys]::SendWait('{%}{%}{%}{%}{LEFT}{LEFT}')\"")
 
   ;; Insert "<code></code>" and place cursor at end of first tag: <code>|</code>
-  ;; Assumes a US-like layout where '<' is Shift+comma and '>' is Shift+dot.
-  ins-code (macro S-comm c o d e S-dot S-comm slsh c o d e S-dot
-                  left left left left left left left)
+  ;; Implemented via PowerShell SendKeys to avoid layout-specific key names.
+  ;; Sends: <code></code> then Left x7 (<code>|</code>)
+  ins-code (cmd "powershell -NoProfile -ExecutionPolicy Bypass -Command \"Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.SendKeys]::SendWait('<code></code>{LEFT}{LEFT}{LEFT}{LEFT}{LEFT}{LEFT}{LEFT}')\"")
 
   ;; Toggle active window "always on top" (Windows).
   ;; Uses user32.dll; no external dependencies.
