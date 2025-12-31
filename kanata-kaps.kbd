@@ -4,6 +4,9 @@
 ;; Notes:
 ;; - This file only intercepts the specific keys needed for the bindings below.
 ;; - Everything else stays fully native (process-unmapped-keys = no).
+;; - On Windows (esp. AltGr layouts like Romanian), do NOT intercept Ctrl/Alt/AltGr.
+;;   AltGr is often implemented as Ctrl+Alt internally; intercepting those modifiers
+;;   can desync key-up events and leave Ctrl "stuck".
 
 ;; ---------- Global config ----------
 
@@ -15,17 +18,12 @@
 (defsrc
   tab 1 2 3 4 5 6 q w e r t
   caps a s d
-  z x c v b spc lctl lalt
+  z x c v b spc
 )
 
 (defalias
   ;; CapsLock held = nav layer
   caps-nav (layer-while-held nav)
-
-  ;; Ctrl held keeps acting as Ctrl, and also enables ctl layer.
-  ;; In ctl layer, Alt held keeps acting as Alt and enables ctl-alt layer.
-  ctl-hold (multi lctl (layer-while-held ctl))
-  alt-ctl  (multi lalt (layer-while-held ctl-alt))
 
   ;; Delete current line (cursor can be anywhere): Home, select to end, include newline, delete
   del-line (macro home S-end S-rght del)
@@ -37,7 +35,7 @@
 (deflayer base
   tab 1 2 3 4 5 6 q w e r t
   @caps-nav a s d
-  z x c v b spc @ctl-hold lalt
+  z x c v b spc
 )
 
 (deflayer nav
@@ -47,19 +45,6 @@
   ;; Row 2 corresponds to: caps a s d
   _    left down rght
 
-  ;; Row 3 corresponds to: z x c v b spc lctl lalt
-  @del-line enter @new-line pgdn pgup _ _ _
-)
-
-(deflayer ctl
-  ;; Keep Ctrl behavior; only use this layer to detect Alt and enter ctl-alt.
-  _ _ _ _ _ _ _ _ _ _ _ _
-  _ _ _ _
-  _ _ _ _ _ _ lctl @alt-ctl
-)
-
-(deflayer ctl-alt
-  _ _ _ _ _ _ _ _ _ _ _ _
-  _ _ _ _
-  _ _ _ _ _ _ _ _
+  ;; Row 3 corresponds to: z x c v b spc
+  @del-line enter @new-line pgdn pgup _
 )
